@@ -1,6 +1,7 @@
-import { Component, ElementRef, Input, ViewChild } from "@angular/core";
+import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { faUser } from '@fortawesome/free-solid-svg-icons';
-import { scan, shareReplay, tap } from "rxjs/operators";
+import { ReplaySubject, Subject } from "rxjs";
+import { scan, shareReplay, take, takeUntil, tap } from "rxjs/operators";
 import { AppStateService } from "../../services/app_state.service";
 import { SocketService } from "../../services/socket.service";
 import { TelegramAuthService } from "../../services/telegram_auth.service";
@@ -17,7 +18,7 @@ interface IMessage {
     styleUrls: ['./live-chat.component.scss'],
     templateUrl: './live-chat.component.html',
 })
-export class LiveChat {
+export class LiveChat implements OnInit, OnDestroy {
 
     public readonly icons = {
         user_avatar: faUser,
@@ -26,7 +27,11 @@ export class LiveChat {
     /**
      * The stream identifier whose chat should be presented here
      */
-    @Input('chatroom') public chatroom_identifier!: string;
+    @Input('chatroom') public set chatroom_identifier(id: string) {
+        this.chatroom_identifier$.next(id);
+    }
+
+    private chatroom_identifier$ = new ReplaySubject<string>(1);
 
     /**
      * The scroll box containing all the messages
@@ -43,6 +48,7 @@ export class LiveChat {
      */
     public messages$ = this.socket_service.event$('chat.message')
         .pipe(scan((msgs: IMessage[], m: IMessage) => {
+            console.log('STUFF: ', m);
             const new_msgs = [
                 ...msgs,
                 {
@@ -62,11 +68,35 @@ export class LiveChat {
         }))
         .pipe(shareReplay(1));
 
+    /**
+     * Subject emitted when the component is destroyed
+     */
+    private destroyed$ = new Subject<void>();
+
     public constructor(
         private socket_service: SocketService,
         public app_state_service: AppStateService,
         public telegram_auth_service: TelegramAuthService,
     ) {}
+
+    /**
+     * Called when the component is initialized
+     */
+    public ngOnInit(): void {
+        this.chatroom_identifier$
+            .pipe(takeUntil(this.destroyed$))
+            .subscribe(chatroom_identifier => {
+                this.socket_service.join_stream(chatroom_identifier);
+            });
+    }
+
+    /**
+     * Called when the component is destroyed
+     */
+    public ngOnDestroy(): void {
+        this.destroyed$.next();
+        this.destroyed$.complete();
+    }
 
     /**
      * Checks if the live chat is locked to the bottom
@@ -97,14 +127,19 @@ export class LiveChat {
 
     }
 
-    public clicked_send(user: User): void {
+    public async clicked_send(user: User) {
 
         // If the field value is empty
         if (this.field_value.trim().length === 0 || this.field_value.trim().length > 280) return;
 
+        // Get the chatroom identifier
+        const chatroom_identifier = await this.chatroom_identifier$
+            .pipe(take(1))
+            .toPromise();
+
         // Send the message
         this.socket_service.send_message(
-            this.chatroom_identifier,
+            chatroom_identifier,
             this.field_value.trim(),
             user,
         );
