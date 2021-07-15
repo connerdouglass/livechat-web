@@ -1,0 +1,3 @@
+<app-live-chat
+    *ngIf="chat_room_identifier$ | async as chat_room_identifier"
+    [chatroom]="chat_room_identifier"></app-live-chat>
