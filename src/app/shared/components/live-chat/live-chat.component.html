@@ -24,29 +24,22 @@
                 </div>
             </div>
         </div>
-        <div class="fieldbox">
-            <ng-container *ngIf="telegram_auth_service.user$ | async as user; else: no_user">
-                <div class="top">
-                    <input
-                        type="text"
-                        [(ngModel)]="field_value"
-                        placeholder="Send a message..."
-                        (keydown.enter)="clicked_send(user)"
-                        maxlength="280" />
-                </div>
-                <div class="bottom">
-                    <button
-                        mat-button
-                        (click)="clicked_send(user)">Send</button>
-                </div>
-            </ng-container>
-            <ng-template #no_user>
-                <div class="login-box" *ngIf="app_state_service.state$ | async as app_state">
-                    <app-telegram-login-button
-                        [botName]="app_state.telegram_bot_username"
-                        (login)="telegram_auth_service.storeUser($event)"></app-telegram-login-button>
-                </div>
-            </ng-template>
+        <div
+            class="fieldbox"
+            *ngIf="telegram_auth_service.user$ | async as user">
+            <div class="top">
+                <input
+                    type="text"
+                    [(ngModel)]="field_value"
+                    placeholder="Send a message..."
+                    (keydown.enter)="clicked_send(user)"
+                    maxlength="280" />
+            </div>
+            <div class="bottom">
+                <button
+                    mat-button
+                    (click)="clicked_send(user)">Send</button>
+            </div>
         </div>
     </div>
 </div>
