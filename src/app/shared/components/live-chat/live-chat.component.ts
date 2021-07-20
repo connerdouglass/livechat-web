@@ -3,9 +3,8 @@ import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { ReplaySubject, Subject } from "rxjs";
 import { scan, shareReplay, take, takeUntil, tap } from "rxjs/operators";
 import { AppStateService } from "../../services/app_state.service";
+import { ChatUser, ChatUserService } from "../../services/chat_user.service";
 import { SocketService } from "../../services/socket.service";
-import { TelegramAuthService } from "../../services/telegram_auth.service";
-import { User } from "../telegram-login-button/telegram-login-button.component";
 
 interface IMessage {
     username: string;
@@ -76,7 +75,7 @@ export class LiveChat implements OnInit, OnDestroy {
     public constructor(
         private socket_service: SocketService,
         public app_state_service: AppStateService,
-        public telegram_auth_service: TelegramAuthService,
+        public chat_user_service: ChatUserService,
     ) {}
 
     /**
@@ -127,7 +126,7 @@ export class LiveChat implements OnInit, OnDestroy {
 
     }
 
-    public async clicked_send(user: User) {
+    public async clicked_send(user: ChatUser) {
 
         // If the field value is empty
         if (this.field_value.trim().length === 0 || this.field_value.trim().length > 280) return;

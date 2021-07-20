@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { TelegramAuthService } from './shared/services/telegram_auth.service';
+import { ChatUserService } from './shared/services/chat_user.service';
 
 @Component({
 	selector: 'app-root',
@@ -12,12 +12,12 @@ export class AppComponent implements OnInit, OnDestroy {
 		const data = event.data;
 		if (!data || typeof data !== 'object') return;
 		if (data.type === 'auth') {
-			this.telegram_auth_service.storeUser(data.user);
+			this.chat_user_service.user$.next(data.user);
 		}
 	};
 
 	public constructor(
-		private telegram_auth_service: TelegramAuthService,
+		private chat_user_service: ChatUserService,
 	) {}
 
 	public ngOnInit(): void {

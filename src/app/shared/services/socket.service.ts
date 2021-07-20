@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { fromEvent, Observable } from "rxjs";
 import { map, shareReplay, switchMap, take } from "rxjs/operators";
 import SocketIOClient from 'socket.io-client';
-import { User } from "../components/telegram-login-button/telegram-login-button.component";
+import { ChatUser } from "./chat_user.service";
 import { SiteConfigService } from "./site_config.service";
 
 @Injectable({
@@ -36,7 +36,7 @@ export class SocketService {
         });
     }
 
-    public send_message(chat_room_identifier: string, message: string, user: User): void {
+    public send_message(chat_room_identifier: string, message: string, user: ChatUser): void {
         this.use_socket(socket => {
             socket.emit('chatroom.message', {
                 chat_room_identifier,

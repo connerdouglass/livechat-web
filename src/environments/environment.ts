@@ -7,15 +7,6 @@ export const environment = {
 	site_config: {
 		api_baseurl: 'http://localhost:8080',
 	},
-	telegram_user: {
-		id: 1,
-		first_name: 'Test',
-		last_name: 'User',
-		username: 'testuser',
-		photo_url: undefined,
-		auth_date: Math.floor(Date.now() / 1000),
-		hash: '',
-	},
 };
 
 /*
