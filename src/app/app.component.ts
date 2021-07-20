@@ -22,7 +22,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
 	public ngOnInit(): void {
 		window.addEventListener('message', this.message_handler);
-		window.parent.postMessage({
+		window.parent?.postMessage({
 			type: 'chatroom-ready',
 		}, '*');
 	}
