@@ -46,16 +46,16 @@ export class LiveChat implements OnInit, OnDestroy {
     /**
      * Observable to the messages on the live chat
      */
-    public messages$ = this.socket_service.event$('chat.message')
-        .pipe(scan((msgs: IMessage[], m: IMessage) => {
-            console.log('STUFF: ', m);
+    public messages$ = this.socket_service.event$('chat.messages')
+        .pipe(scan((msgs: IMessage[], ms: IMessage[]) => {
+            console.log('STUFF: ', ms);
             const new_msgs = [
                 ...msgs,
-                {
+                ...ms.map(m => ({
                     ...m,
                     username: decodeURIComponent(m.username),
                     message: decodeURIComponent(m.message),
-                }
+                })),
             ];
             while (new_msgs.length > 100) new_msgs.shift();
             return new_msgs;
