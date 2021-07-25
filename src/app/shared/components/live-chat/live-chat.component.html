@@ -7,7 +7,7 @@
             <div
                 *ngFor="let message of messages$ | async"
                 class="message"
-                (click)="revoke_message(message)">
+                [class.moderating]="message === mod_active_message">
                 <div class="left">
                     <div
                         *ngIf="message.photo_url"
@@ -22,6 +22,30 @@
                 <div class="right">
                     <span class="name">{{ message.username }}</span>
                     <span class="message">{{ message.message }}</span>
+                </div>
+                <div
+                    *ngIf="(chat_user_service.user$ | async)?.moderator"
+                    class="mod">
+                    <mat-menu
+                        #modMenu="matMenu"
+                        class="mod-menu">
+                        <button
+                            mat-menu-item
+                            (click)="revoke_message(message)">
+                            <fa-icon
+                                [fixedWidth]="true"
+                                [icon]="icons.mod_delete"></fa-icon>
+                            <span>Delete</span>
+                        </button>
+                    </mat-menu>
+                    <div
+                        class="mod-button"
+                        matRipple
+                        [matMenuTriggerFor]="modMenu"
+                        (menuOpened)="mod_active_message = message"
+                        (menuClosed)="mod_active_message = null">
+                        <fa-icon [icon]="icons.mod"></fa-icon>
+                    </div>
                 </div>
             </div>
         </div>

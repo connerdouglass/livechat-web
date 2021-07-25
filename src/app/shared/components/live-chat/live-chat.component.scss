@@ -41,6 +41,13 @@
                 display: flex;
                 padding-top: 6px;
                 padding-bottom: 6px;
+                transition: background-color 0.3s;
+
+                &:hover,
+                &.moderating
+                {
+                    background-color: rgba(255, 255, 255, 0.03);
+                }
 
                 > .left
                 {
@@ -87,6 +94,27 @@
                     > .message
                     {
                         color: rgba(255, 255, 255, 0.9);
+                    }
+                }
+
+                > .mod
+                {
+                    flex-grow: 0;
+                    flex-shrink: 0;
+                    width: 48px;
+                    text-align: center;
+
+                    > .mod-button
+                    {
+                        $mod-button-size: 24px;
+
+                        display: inline-block;
+                        width: $mod-button-size;
+                        height: $mod-button-size;
+                        text-align: center;
+                        line-height: $mod-button-size;
+                        border-radius: $mod-button-size / 2;
+                        cursor: pointer;
                     }
                 }
             }
@@ -155,6 +183,23 @@
                     }
                 }
             }
+        }
+    }
+}
+
+::ng-deep .mod-menu
+{
+    background-color: #333;
+
+    button[mat-menu-item]
+    {
+        color: #FFF;
+        font-weight: 600;
+        text-transform: uppercase;
+
+        fa-icon
+        {
+            margin-right: 10px;
         }
     }
 }

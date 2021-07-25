@@ -2,7 +2,9 @@ import { CommonModule } from '@angular/common';
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatRippleModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { LiveChat } from './components/live-chat/live-chat.component';
@@ -31,6 +33,8 @@ import { StudioService } from './services/studio.service';
 		MatInputModule,
 		MatButtonModule,
 		MatProgressSpinnerModule,
+		MatMenuModule,
+		MatRippleModule,
 	],
 	exports: [
 		LiveChat,

@@ -1,5 +1,5 @@
 import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from "@angular/core";
-import { faArrowRight, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faCaretDown, faTimes, faUser } from '@fortawesome/free-solid-svg-icons';
 import { merge, ReplaySubject, Subject } from "rxjs";
 import { map, scan, shareReplay, take, takeUntil, tap } from "rxjs/operators";
 import { AppStateService } from "../../services/app_state.service";
@@ -27,6 +27,8 @@ export class LiveChat implements OnInit, OnDestroy {
     public readonly icons = {
         user_avatar: faUser,
         send: faArrowRight,
+        mod: faCaretDown,
+        mod_delete: faTimes,
     };
 
     /**
@@ -50,6 +52,11 @@ export class LiveChat implements OnInit, OnDestroy {
      * The value of the text field
      */
     public field_value = '';
+
+    /**
+     * The message being actively moderated (for which the menu is open)
+     */
+    public mod_active_message: IMessage | null = null;
 
     /**
      * Observable to the messages on the live chat

@@ -9,6 +9,7 @@ export const environment = {
 	},
 	user: {
 		username: 'testuser',
+		moderator: true,
 	},
 };
 
