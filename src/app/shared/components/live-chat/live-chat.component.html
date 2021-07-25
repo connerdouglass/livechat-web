@@ -39,7 +39,11 @@
             <div class="bottom">
                 <button
                     mat-button
-                    (click)="clicked_send(user)">Send</button>
+                    (click)="clicked_send(user)"
+                    [disabled]="field_value.trim().length == 0">
+                    <span>Send</span>
+                    <fa-icon [icon]="icons.send"></fa-icon>
+                </button>
             </div>
         </div>
     </div>

@@ -5,6 +5,7 @@ import { environment } from "src/environments/environment";
 export interface ChatUser {
     username: string;
     photo_url?: string;
+    moderator?: boolean;
 }
 
 @Injectable()

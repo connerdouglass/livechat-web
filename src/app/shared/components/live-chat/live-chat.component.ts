@@ -1,5 +1,5 @@
 import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from "@angular/core";
-import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faUser } from '@fortawesome/free-solid-svg-icons';
 import { merge, ReplaySubject, Subject } from "rxjs";
 import { map, scan, shareReplay, take, takeUntil, tap } from "rxjs/operators";
 import { AppStateService } from "../../services/app_state.service";
@@ -26,15 +26,19 @@ export class LiveChat implements OnInit, OnDestroy {
 
     public readonly icons = {
         user_avatar: faUser,
+        send: faArrowRight,
     };
 
     /**
-     * The stream identifier whose chat should be presented here
+     * The chatroom identifier whose chat should be presented here
      */
     @Input('chatroom') public set chatroom_identifier(id: string) {
         this.chatroom_identifier$.next(id);
     }
 
+    /**
+     * Subject for the identifier of the chatroom
+     */
     private chatroom_identifier$ = new ReplaySubject<string>(1);
 
     /**
@@ -70,7 +74,7 @@ export class LiveChat implements OnInit, OnDestroy {
                 return msgs.filter(m => m.id !== update.id);
             }
             return msgs;
-        }, [] as IMessage[]))
+        }, []))
         .pipe(tap(() => {
             setTimeout(() => {
                 console.log('Scrolling down');
