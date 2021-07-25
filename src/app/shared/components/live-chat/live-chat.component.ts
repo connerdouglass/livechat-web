@@ -51,11 +51,10 @@ export class LiveChat implements OnInit, OnDestroy {
      * Observable to the messages on the live chat
      */
     public messages$ = merge(
-            this.socket_service.event$('chat.messages').pipe(tap(d => console.log(JSON.stringify(d, null, 4)))).pipe(map(ms => (<MessagesUpdate>{ type: 'add', ms }))),
+            this.socket_service.event$('chat.messages').pipe(map(ms => (<MessagesUpdate>{ type: 'add', ms }))),
             this.socket_service.event$('chat.revoke-message').pipe(map(data => (<MessagesUpdate>{ type: 'revoke', id: data.id }))),
         )
         .pipe(scan((msgs: IMessage[], update: MessagesUpdate) => {
-            console.log('STUFF: ', update);
             if (update.type === 'add') {
                 const new_msgs = [
                     ...msgs,
