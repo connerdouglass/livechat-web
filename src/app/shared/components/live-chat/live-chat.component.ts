@@ -1,16 +1,21 @@
 import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { faUser } from '@fortawesome/free-solid-svg-icons';
-import { ReplaySubject, Subject } from "rxjs";
-import { scan, shareReplay, take, takeUntil, tap } from "rxjs/operators";
+import { merge, ReplaySubject, Subject } from "rxjs";
+import { map, scan, shareReplay, take, takeUntil, tap } from "rxjs/operators";
 import { AppStateService } from "../../services/app_state.service";
 import { ChatUser, ChatUserService } from "../../services/chat_user.service";
 import { SocketService } from "../../services/socket.service";
 
 interface IMessage {
+    id: string;
     username: string;
     photo_url?: string;
     message: string;
 }
+
+type MessagesUpdate =
+    | { type: 'add'; ms: IMessage[]; }
+    | { type: 'revoke'; id: string; };
 
 @Component({
     selector: 'app-live-chat',
@@ -45,20 +50,28 @@ export class LiveChat implements OnInit, OnDestroy {
     /**
      * Observable to the messages on the live chat
      */
-    public messages$ = this.socket_service.event$('chat.messages')
-        .pipe(scan((msgs: IMessage[], ms: IMessage[]) => {
-            console.log('STUFF: ', ms);
-            const new_msgs = [
-                ...msgs,
-                ...ms.map(m => ({
-                    ...m,
-                    username: decodeURIComponent(m.username),
-                    message: decodeURIComponent(m.message),
-                })),
-            ];
-            while (new_msgs.length > 100) new_msgs.shift();
-            return new_msgs;
-        }, []))
+    public messages$ = merge(
+            this.socket_service.event$('chat.messages').pipe(tap(d => console.log(JSON.stringify(d, null, 4)))).pipe(map(ms => (<MessagesUpdate>{ type: 'add', ms }))),
+            this.socket_service.event$('chat.revoke-message').pipe(map(data => (<MessagesUpdate>{ type: 'revoke', id: data.id }))),
+        )
+        .pipe(scan((msgs: IMessage[], update: MessagesUpdate) => {
+            console.log('STUFF: ', update);
+            if (update.type === 'add') {
+                const new_msgs = [
+                    ...msgs,
+                    ...update.ms.map(m => ({
+                        ...m,
+                        username: decodeURIComponent(m.username),
+                        message: decodeURIComponent(m.message),
+                    })),
+                ];
+                while (new_msgs.length > 100) new_msgs.shift();
+                return new_msgs;
+            } else if (update.type === 'revoke') {
+                return msgs.filter(m => m.id !== update.id);
+            }
+            return msgs;
+        }, [] as IMessage[]))
         .pipe(tap(() => {
             setTimeout(() => {
                 console.log('Scrolling down');
@@ -145,6 +158,21 @@ export class LiveChat implements OnInit, OnDestroy {
 
         // Clear the field value
         this.field_value = '';
+
+    }
+
+    public async revoke_message(msg: IMessage) {
+
+        // Get the chatroom identifier
+        const chatroom_identifier = await this.chatroom_identifier$
+            .pipe(take(1))
+            .toPromise();
+
+        // Send the message
+        this.socket_service.revoke_message(
+            chatroom_identifier,
+            msg.id,
+        );
 
     }
 

@@ -6,7 +6,8 @@
         <div #messages_scrollbox class="messages">
             <div
                 *ngFor="let message of messages$ | async"
-                class="message">
+                class="message"
+                (click)="revoke_message(message)">
                 <div class="left">
                     <div
                         *ngIf="message.photo_url"

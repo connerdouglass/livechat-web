@@ -49,6 +49,15 @@ export class SocketService {
         });
     }
 
+    public revoke_message(chat_room_identifier: string, message_id: string): void {
+        this.use_socket(socket => {
+            socket.emit('chatroom.revoke-message', {
+                chat_room_identifier,
+                message_id,
+            });
+        });
+    }
+
     public event$<T = any>(event: string): Observable<T> {
         return this.socket$
             .pipe(switchMap(socket => fromEvent<T>(socket, event)));

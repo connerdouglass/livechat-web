@@ -7,6 +7,9 @@ export const environment = {
 	site_config: {
 		api_baseurl: 'http://localhost:8080',
 	},
+	user: {
+		username: 'testuser',
+	},
 };
 
 /*
